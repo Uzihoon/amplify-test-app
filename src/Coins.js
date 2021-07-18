@@ -3,19 +3,33 @@ import React, { useEffect, useState } from 'react';
 
 function Coins() {
   const [coins, updateCoins] = useState([]);
+  const [input, updateInput] = useState({ limit: 5, start: 0 });
+
+  function updateInputValue(type, value) {
+    updateInput({ ...input, [type]: value });
+  }
 
   // Call API
   async function fetchCoins() {
-    const data = await API.get('cryptoapi', '/coins');
+    const { limit, start } = input;
+    const data = await API.get(
+      'cryptoapi',
+      `/coins?limit=${limit}&start=${start}`
+    );
     updateCoins(data.coins);
   }
 
-  useEffect(() => {
-    fetchCoins();
-  }, []);
-
   return (
     <div>
+      <input
+        onChange={({ target: { value } }) => updateInputValue('limit', value)}
+        placeholder='Limit'
+      />
+      <input
+        onChange={({ target: { value } }) => updateInputValue('start', value)}
+        placeholder='Start'
+      />
+      <button onClick={fetchCoins}>Fetch Coins</button>
       {coins.map((coin, index) => (
         <div key={index}>
           <h2>
